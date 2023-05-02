@@ -1,0 +1,18 @@
+services:
+  nginx:
+    environment:
+      NGINX_ENTRYPOINT_QUIET_LOGS: 0
+    command: [nginx-debug, '-g', 'daemon off;']
+    volumes:
+      -./public:/var/www/public
+  php:
+    build:
+      target: php_dev
+    environment:
+      XDEBUG_CONFIG: "client_host=host.docker.internal"
+      PHP_IDE_CONFIG: ${PHP_IDE_CONFIG?}
+    volumes:
+      -./:/var/www
+    working_dir: /var/www
+    extra_hosts:
+      - host.docker.internal:host-gateway

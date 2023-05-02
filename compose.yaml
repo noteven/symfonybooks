@@ -1,0 +1,63 @@
+services:
+  nginx:
+    image: nginx:1-alpine
+    restart: unless-stopped
+    environment:
+      NGINX_PORT: ${NGINX_PORT:-80}
+      NGINX_ENTRYPOINT_QUIET_LOGS: 1
+      PHPFPM_SERVICE_NAME: "php"
+      PHPFPM_SERVICE_PORT: 9000
+      PROJECT_DIR: ${PROJECT_DIR:-/var/www}
+    volumes:
+      - ./docker/nginx/templates:/etc/nginx/templates
+      - ./public:${PROJECT_DIR:-/var/www}/public
+    ports:
+      - "${EXPOSED_PORT:-8080}:${NGINX_PORT:-80}"
+    networks:
+      - internal
+
+  php:
+    build:
+      dockerfile: docker/php/Dockerfile
+      context: ./
+      target: php_prod
+      args:
+        PROJECT_DIR: ${PROJECT_DIR:-/var/www}
+        PHP_VERSION: ${PHP_VERSION:-8.1}
+        COMPOSER_VERSION: ${COMPOSER_VERSION:-2}
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:?postgres_user}:${POSTGRES_PASSWORD:?postgres_password}@database:5432/${POSTGRES_DB:-postgres}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
+    healthcheck:
+      test: ["CMD", "sh fpm-healthcheck"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+    networks:
+      - internal
+
+  db:
+    image: postgres:${POSTGRES_VERSION:-15}-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?postgres_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?postgres_password}
+      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      LANG: "${POSTGRES_LOCALE:-en_US}.${POSTGRES_CHARSET:-utf8}"
+      POSTGRES_INITDB_ARGS: "--locale-provider=icu --icu-locale=${POSTGRES_LOCALE:-en.US}"
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge
