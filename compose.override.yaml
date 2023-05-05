@@ -3,13 +3,14 @@ services:
     environment:
       NGINX_ENTRYPOINT_QUIET_LOGS: 0
     command: [nginx-debug, '-g', 'daemon off;']
+    working_dir: /var/www
     volumes:
-      - ./public:/var/www/public
+      - ./public:/var/www/public  
   php:
     build:
       target: php_dev
     environment:
-      XDEBUG_CONFIG: "client_host=host.docker.internal"
+      XDEBUG_CONFIG: "client_host=host.docker.internal client_port=9000 idekey=PHPSTORM remote_handler=dbgp"
     volumes:
       - ./:/var/www
     working_dir: /var/www

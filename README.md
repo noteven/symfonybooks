@@ -9,9 +9,10 @@ docker-compose -d up
 Then simply visit `localhost:8080`.
 
 ## Testing
+Testing utilized `paratest`, a (mostly?) drop-in replacement for `PHPUnit` supporting parallel test execution.
 ```
 composer install
-./bin/phpunit --verbose tests
+./bin/paratest --verbose tests
 ```
 
 ## Contributing

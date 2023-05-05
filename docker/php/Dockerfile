@@ -52,6 +52,7 @@ COPY --from=vendor ${PROJECT_DIR} ./
 
 COPY --link docker/php/conf.d $PHP_INI_DIR/conf.d
 COPY docker/php/php-fpm.d/zz-docker.conf $PHP_INI_DIR/../php-fpm.d/zz-docker.conf
+RUN rm "$PHP_INI_DIR/conf.d/xdebug.ini"
 
 # Install php-fpm-healthcheck dependencies
 # https://github.com/renatomefi/php-fpm-healthcheck#requirements
@@ -97,6 +98,7 @@ COPY --from=composer --link /usr/bin/composer /usr/bin/composer
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini" && \
     rm "$PHP_INI_DIR/conf.d/opcache.prod.ini"
+COPY ./docker/php/conf.d/xdebug.ini $PHP_INI_DIR/conf.d/xdebug.ini
 
 RUN apk add --no-cache --virtual .php-deps $PHPIZE_DEPS linux-headers \
     && pecl install xdebug \
@@ -118,4 +120,3 @@ RUN set -eux; \
     fi
 
 RUN rm -f .env.local.php
-

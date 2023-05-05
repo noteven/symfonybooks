@@ -1,17 +1,19 @@
+includes:
+  - vendor/phpstan/phpstan-phpunit/extension.neon
+  - vendor/phpstan/phpstan-symfony/extension.neon
+  - vendor/phpstan/phpstan-doctrine/extension.neon
 parameters:
     level: 8
-
     reportUnmatchedIgnoredErrors: false
-
-    # requires exact closure types
     checkMissingCallableSignature: true
-
     paths:
         - src
         - tests
         - config
-
     bootstrapFiles:
         - tests/bootstrap.php
-        # load functions like service() etc.
         - vendor/symfony/dependency-injection/Loader/Configurator/ContainerConfigurator.php
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+    scanDirectories:
+        - var/cache/dev/Symfony/Config
