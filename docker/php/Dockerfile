@@ -67,10 +67,10 @@ RUN set -eux; \
 
 # Install base/common extensions
 RUN set -eux; \
-	curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
-    opcache intl pdo_pgsql uuid gettext; # Interesting extensions: zip gettext parallel swoole sync
+	curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - \
+    | IPE_ICU_EN_ONLY=0 sh -s opcache intl pdo_pgsql uuid gettext; # Interesting extensions: zip gettext parallel swoole sync
 
-#CMD ["php-fpm"]
+CMD ["php-fpm"]
 
 ##################
 # Prod Container #
@@ -95,6 +95,10 @@ ENV APP_ENV=dev
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV PATH="${PATH}:/root/.composer/vendor/bin"
 COPY --from=composer --link /usr/bin/composer /usr/bin/composer
+
+# OpCache/APCU admin tool
+RUN curl -sLO --output-dir /usr/local/bin https://github.com/gordalina/cachetool/releases/latest/download/cachetool.phar; \
+    chmod +x /usr/local/bin/cachetool.phar;
 
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini" && \
     rm "$PHP_INI_DIR/conf.d/opcache.prod.ini"
