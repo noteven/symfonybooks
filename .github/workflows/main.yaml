@@ -25,7 +25,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, iconv, json, mbstring, pdo
+          extensions: mbstring, xml, ctype, iconv, intl, uuid, gettext, pdo, pdo_pgsql, dom, filter, gd, json
 
       # Composer
       - name: Get composer cache directory
@@ -57,7 +57,7 @@ jobs:
         
       - name: Run unit and functional tests (PHPUnit)
         run: |
-            php vendor/bin/phpunit tests
+            php vendor/bin/paratest tests
           
       - name: Scan dependencies for vulnerabilities (Local PHP Security Checker)
         uses: symfonycorp/security-checker-action@v4
