@@ -59,7 +59,7 @@ RUN rm "$PHP_INI_DIR/conf.d/xdebug.ini"
 RUN apk add --no-cache fcgi;
 COPY --link ./docker/php/fpm-healthcheck.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/fpm-healthcheck.sh
-HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["fpm-healthcheck"]
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 CMD ["fpm-healthcheck.sh"]
 
 # Create logging folder
 RUN set -eux; \

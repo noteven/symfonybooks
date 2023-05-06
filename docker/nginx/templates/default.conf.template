@@ -1,4 +1,5 @@
 server {
+    server_name php_fpm;
     listen ${NGINX_PORT};
     root ${PROJECT_DIR}/public;
 
