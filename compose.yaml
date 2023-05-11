@@ -28,8 +28,6 @@ services:
         PHP_VERSION: ${PHP_VERSION:-8.1}
         COMPOSER_VERSION: ${COMPOSER_VERSION:-2}
     restart: unless-stopped
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:?postgres_user}:${POSTGRES_PASSWORD:?postgres_password}@database:5432/${POSTGRES_DB:-postgres}?serverVersion=${POSTGRES_VERSION:-15}&charset=${POSTGRES_CHARSET:-utf8}
     healthcheck:
       test: ["CMD", "sh fpm-healthcheck"]
       interval: 10s
@@ -46,12 +44,12 @@ services:
       - internal
 
   db:
-    image: postgres:${POSTGRES_VERSION:-15}-alpine
+    image: postgres:${POSTGRES_VERSION:?postgres_version}-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?postgres_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?postgres_password}
-      POSTGRES_DB: ${POSTGRES_DB:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:?postgres_db}
       LANG: "${POSTGRES_LOCALE:-en_US}.${POSTGRES_CHARSET:-utf8}"
       POSTGRES_INITDB_ARGS: "--locale-provider=icu --icu-locale=${POSTGRES_LOCALE:-en.US}"
     healthcheck:
